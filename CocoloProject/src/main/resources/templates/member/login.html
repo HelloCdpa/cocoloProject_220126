@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lagn="en"
+      xmlns:th="http://www.thymeleaf.org">
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+
+<!-- 공통 헤드-->
+<th:block th:replace="/layout/fragments/head :: headFragment"></th:block>
+
+<body class="sign-in-basic">
+<!--임시 비번 모달-->
+<div id="findPw" class="modal fade">
+    <div class="modal-dialog modal-dialog-centered modal-login">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                    <div class="container my-auto">
+                        <div class="row">
+                            <div class="card z-index-0 fadeIn3 fadeInBottom">
+                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                    <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                                        <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">비밀번호 찾기</h4>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <form role="form" class="text-start" action="/member/sendEmail" method="post" name="sendEmail">
+                                        <p>입력한 이메일로 임시 비밀번호가 전송됩니다.</p>
+                                        <div class="input-group input-group-outline my-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" id="userEmail" name="memberEmail" class="form-control" required>
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="button" class="btn bg-gradient-primary w-100 my-4 mb-2"
+                                                    id="checkEmail">비밀번호 발송</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="wrapper">
+    <th:block th:replace="/layout/fragments/navbar :: navbarFragment"></th:block>
+    <div class="page-header align-items-start min-vh-100"
+         style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');"
+         loading="lazy">
+        <span class="mask bg-gradient-dark opacity-6"></span>
+        <div class="container my-8">
+            <div class="row">
+                <div class="col-lg-4 col-md-8 col-12 mx-auto">
+                    <div class="card z-index-0 fadeIn3 fadeInBottom">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                                <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">로그인</h4>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form action="/member/login" method="post" role="form" class="text-start">
+                                <div class="input-group input-group-outline my-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="memberEmail" id="memberEmail" class="form-control">
+                                </div>
+                                <div class="input-group input-group-outline mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" name="memberPassword" class="form-control">
+                                </div>
+                                <div class="form-check form-switch d-flex align-items-center mb-3">
+                                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                                    <label class="form-check-label mb-0 ms-2" for="rememberMe">Remember me</label>
+                                </div>
+                                <div class="text-center">
+                                    <input type="submit" class="btn bg-gradient-primary w-100 my-4 mb-2" value="로그인">
+                                </div>
+                                <div class="text-center">
+                                    <a class="p-2"
+                                       href="https://kauth.kakao.com/oauth/authorize?client_id=198b13b4aad42557177244425bb771f9&redirect_uri=http://localhost:8093/member/kakaologin&response_type=code">
+                                        <img src="/assets/img/kakao.png" class="w-md-90 h-auto">
+                                    </a>
+                                </div>
+                                <p class="mt-4 text-sm text-center">
+                                    회원이 아니신가요?
+                                    <a href="/member/save" class="text-primary text-gradient font-weight-bold">회원가입 하러
+                                        가기!</a>
+                                </p>
+                                <p class="mt-4 text-sm text-center">
+                                    <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                                            data-bs-target="#findPw">비밀번호를 잊으셨나요?</button>
+                                </p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<th:block th:replace="/layout/fragments/script :: scriptFragment"></th:block>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script>
+    $(document).ready(function () {
+        let message = "[[${msg}]]";
+        if (message != "") {
+            alert(message);
+        } else {
+
+        }
+    })
+
+    // $(function () {
+    //     let rememberMe = $("#rememberMe");
+    //     //쿠키가 있는지 확인
+    //     let userEmail = getCookie("userEmail");
+    //
+    //     //rememberMe에 체크가 되어있는지 확인
+    //     if (userEmail) {
+    //         rememberMe.attr("checked", true);
+    //         $("#memberEmail").val(userEmail);
+    //     }
+    //
+    //     if (rememberMe[0].checked) {
+    //         setCookie("userEmail", $("#memberEmail").val(), 7);
+    //     } else {
+    //         deleteCookie("userEmail");
+    //     }
+    // });
+
+
+</script>
+
+<script>
+    $("#checkEmail").click(function () {
+        const userEmail = $("#userEmail").val();
+        const sendEmail = document.forms["sendEmail"];
+        $.ajax({
+            type: 'post',
+            url: 'emailDuplication',
+            data: {
+                'memberEmail': userEmail
+            },
+            dataType: "text",
+            success: function (result) {
+                if(result == "no"){
+                    // 중복되는 것이 있다면 no == 일치하는 이메일이 있다!
+                    alert('임시비밀번호를 전송 했습니다.');
+                    sendEmail.submit();
+                }else {
+                    alert('가입되지 않은 이메일입니다.');
+                }
+
+            },error: function () {
+                console.log('에러 체크!!')
+
+            }
+        })
+    });
+
+
+
+
+
+</script>
+
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<th:block th:fragment="courseSaveFragment">
+
+    <input type="hidden" th:value="${session['loginNick']}" id="loginNick">
+    <div class="modal fade" id="courseSaveModalFragment" data-bs-backdrop="static" tabindex="-1"
+         aria-labelledby="staticBackdropLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <label class="modal-title" id="staticBackdropLabel">수업 업로드</label>
+                </div>
+                <div class="modal-body">
+                    <form class="form-control" action="/course/save" method="post" enctype="multipart/form-data">
+                        <div class="container my-auto">
+                            <div class="row">
+                                <div class="card z-index-0 fadeIn3 fadeInBottom">
+                                    <div class="card-body">
+                                        <div>
+                                            <h6 th:text="${'온라인 강의 이름 : '+onClass.onClassTitle}"></h6>
+                                            <input type="hidden" name="onClassId" th:value="${onClass.onClassId}">
+                                        </div>
+                                        <div class="input-group input-group-outline my-3">
+                                            <label class="form-label">수업 주차(주제)</label>
+                                            <input type="text" class="form-control" name="courseSection">
+                                        </div>
+                                        <div class="input-group input-group-outline my-3">
+                                            <label class="form-label">수업 제목</label>
+                                            <input type="text" class="form-control" name="courseTitle">
+                                        </div>
+                                        <div class="input-group mb-4 input-group-static">
+                                            <textarea id="summernote" type="text" class="form-control"
+                                                      name="courseContents" rows="5"></textarea>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-3"><h6>파일 업로드</h6></div>
+                                            <div class="col-3">
+                                                <input class="form-control" type="file" name="courseFile">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-container modal-footer">
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                    aria-label="Close">
+                                작성취소
+                            </button>
+                            <input type="submit" class="btn bg-gradient-primary" value="글작성">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<link rel="shortcut icon" href="#">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<th:block th:replace="/layout/fragments/head :: headFragment"></th:block>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
+<body>
+<th:block th:replace="/layout/fragments/navbar :: navbarFragment"></th:block>
+<div style="margin-top: 300px">
+    <div class="card card-body blur shadow-blur mx-3 mx-md-4 mt-n6 mb-4">
+        <!-- START Testimonials w/ user image & text & info -->
+        <section class="py-sm-7 py-5 position-relative">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 mx-auto">
+                        <div class="mt-n8 mt-md-n9 text-center">
+                            <img class="avatar avatar-xxl shadow-xl position-relative z-index-2"
+                                 th:src="@{/member_upload/}+${study.memberProfileName}" alt="bruce" loading="lazy">
+                        </div>
+                        <div class="row py-5">
+                            <div class="col-lg-7 col-md-7 z-index-2 position-relative px-md-2 px-sm-5 mx-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h3 class="mb-0 " th:text="${study.studyTitle}"></h3>
+                                </div>
+                                <div class="row mb-4">
+                                    <div class="col-auto">
+                                        <span class="h6" th:text="${study.studyWriter}"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <span class="h6" th:text="${study.studyCate}"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <span class="h6">스터디 장소 :</span>
+                                        <span th:text="${study.studyPlace}"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p class="text-lg mb-0" th:utext="${study.studyContents}"></p>
+                                    <div class="col-md-3">
+                                        <span class="h6">스터디 모집 인원 :</span>
+                                        <span th:text="${study.studyMax}"></span><span>명</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <span class="h6">현재 모집한 인원 :</span>
+                                        <span th:text="${study.studyCount}"></span><span>명</span>
+                                        <input type="hidden" id="studyId" th:value="${study.studyId}">
+                                        <input type="hidden" id="memberId" th:value="${study.memberId}">
+                                        <input type="hidden" id="loginId" th:value="${session.loginId}">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<th:block th:replace="/layout/fragments/script :: scriptFragment"></th:block>
+
+</body>
+
+</html>

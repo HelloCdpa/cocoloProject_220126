@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<th:block th:fragment="studySaveFragment">
+
+    <input type="hidden" th:value="${session['loginNick']}" id="loginNick">
+    <div class="modal fade" id="studySaveModal" data-bs-backdrop="static" tabindex="-1"
+         aria-labelledby="staticBackdropLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <label class="modal-title" id="staticBackdropLabel">스터디 모집</label>
+                </div>
+                <div class="modal-body">
+                    <form class="form-control" action="/study/save" method="post">
+                        <div class="container my-auto">
+                            <div class="row">
+                                <div class="card z-index-0 fadeIn3 fadeInBottom">
+                                    <div class="card-body">
+                                        <div>
+                                            <input type="radio" class="btn-check" value="취업/면접" name="studyCate"
+                                                   id="job" autocomplete="off" checked>
+                                            <label class="btn btn-outline-primary" for="job">취업/면접</label>
+
+                                            <input type="radio" class="btn-check" value="학습노하우" name="studyCate"
+                                                   id="java" autocomplete="off">
+                                            <label class="btn btn-outline-primary" for="java">자바</label>
+
+                                            <input type="radio" class="btn-check" value="피드백" name="studyCate"
+                                                   id="spring" autocomplete="off">
+                                            <label class="btn btn-outline-primary" for="spring">스프링</label>
+
+                                            <input type="radio" class="btn-check" value="기타" name="studyCate"
+                                                   id="etc" autocomplete="off">
+                                            <label class="btn btn-outline-primary" for="etc">기타</label>
+                                        </div>
+
+                                        <div>
+                                            작성자 : <p th:text="${session['loginNick']}"></p>
+                                            <input type="text" name="memberId" th:value="${session['loginId']}"
+                                                   hidden>
+                                        </div>
+                                        <div class="input-group input-group-outline my-3">
+                                            <label class="form-label">제목</label>
+                                            <input type="text" class="form-control" name="studyTitle">
+                                        </div>
+                                        <div class="input-group mb-4 input-group-static">
+                                            <textarea id="summernote" type="text" class="form-control"
+                                                      name="studyContents" rows="6">
+                                                    [개발 스터디 모집 내용 예시]
+                                                    스터디 주제 : 자바 실력 업!
+                                                    진행 방법 : 한명씩 돌아가며 발표
+                                                    스터디 목표 :  1달 예상
+                                                    예상 스터디 일정(횟수) : 주1회 음성회의
+                                                    기술스택: java, http, css, java script
+                                                    스터디 소개와 개설 이유 : 활발한 커뮤니케이션으로 능력을 업!
+                                                    스터디 관련 주의사항 : 초보 개발자 구해요</textarea>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <label class="form-label">스터디 장소</label>
+                                                <div class="input-group input-group-outline my-3">
+                                                    <input type="text" class="form-control" name="studyPlace">
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <label class="form-label">스터디 모집 인원</label>
+                                                <div class="input-group input-group-outline my-3">
+                                                    <input type="text" class="form-control" name="studyMax">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-container modal-footer">
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                    aria-label="Close">
+                                작성취소
+                            </button>
+                            <input type="submit" class="btn bg-gradient-primary" value="글작성">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+</body>
+</html>

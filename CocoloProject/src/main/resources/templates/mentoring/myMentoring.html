@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<link rel="shortcut icon" href="#">
+<style>
+    #background {
+        background-image: url("https://cdn.pixabay.com/photo/2018/06/29/08/15/doodle-3505459_1280.png");
+    }
+</style>
+<th:block th:replace="/layout/fragments/head :: headFragment"></th:block>
+<body>
+<header class="bg-gradient-dark">
+    <th:block th:replace="/layout/fragments/navbar :: navbarFragment"></th:block>
+
+    <div class="page-header min-vh-65" id="background">
+        <span class="mask bg-gradient-dark opacity-6"></span>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center mx-auto my-auto">
+                    <h1 class="text-white">My Mentoring</h1>
+                    <p class="lead mb-4 text-white opacity-8">너는 나의 멘토 멘티</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="row">
+    <div class="col-md-8">
+
+        <div class="card card-body blur shadow-blur mx-1 mx-md-1 mt-n3">
+            <h2>멘토링 현황</h2>
+            <table class="table table-hover table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">제목</th>
+                    <th scope="col">멘토 닉네임</th>
+                    <th scope="col">분야</th>
+                    <th scope="col">횟수</th>
+                    <th scope="col">1회 가격</th>
+                    <th scope="col">신청 날짜</th>
+                </tr>
+                </thead>
+                <tbody th:each="mentee,menteeStat:${menteeList}">
+                <tr>
+                    <th scope="row" th:text="${menteeStat.count}"></th>
+                    <td th:text="${mentee.mentoringTitle}"></td>
+                    <td th:text="${mentee.mentorNickName}"></td>
+                    <td th:text="${mentee.mentoringCate}"></td>
+                    <td th:text="${mentee.menteeCount+'/'+mentee.menteeMax}"></td>
+                    <td th:text="${mentee.mentoringPrice}"></td>
+                    <td th:text="*{#temporals.format(mentee.createTime, 'yyyy/MM/dd HH:mm')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card card-body blur shadow-blur mx-1 mx-md-1 mt-n3">
+            <h2>나의 멘티 현황</h2>
+            <table class="table table-hover table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">제목</th>
+                    <th scope="col">멘티 닉네임</th>
+                    <th scope="col">분야</th>
+                    <th scope="col">횟수</th>
+                    <th scope="col">1회 가격</th>
+                    <th scope="col">신청 날짜</th>
+                </tr>
+                </thead>
+                <tbody th:each="mentor,mentorStat:${mentorList}">
+                <tr>
+                    <th scope="row" th:text="${mentorStat.count}"></th>
+                    <td th:text="${mentor.mentoringTitle}"></td>
+                    <td th:text="${mentor.menteeNickName}"></td>
+                    <td th:text="${mentor.mentoringCate}"></td>
+                    <td th:text="${mentor.menteeCount+'/'+mentor.menteeMax}"></td>
+                    <td th:text="${mentor.mentoringPrice}"></td>
+                    <td th:text="*{#temporals.format(mentor.createTime, 'yyyy/MM/dd HH:mm')}"></td>
+                    <td>
+                        <button th:unless="${mentor.menteeCount==mentor.menteeMax}" type="button" class="btn btn-danger"
+                                th:onclick="mentoringApply([[${mentor.menteeId}]])">
+                            멘토링 완료
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card card-body blur shadow-blur mx-1 mx-md-1 mt-n3">
+            <form th:action="@{/mentoring/room}" method="post" name="chatRoomSave">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="input-group input-group-outline">
+                            <label class="form-label">방 제목</label>
+                            <input type="text" class="form-control" id="name" name="name">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group input-group-outline">
+                            <label class="form-label">비밀번호 4자리 숫자</label>
+                            <input type="password" class="form-control" id="password" name="password" maxlength="4">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button id="btn-create" class="btn btn-warning">1:1 채팅방 개설</button>
+                    </div>
+                </div>
+            </form>
+            <table class="table table-hover table-sm">
+                <thead>
+                <th>멘토링 1:1 채팅방</th>
+                </thead>
+                <tbody>
+                <tr th:each="room : ${rooms}">
+                    <form action="/mentoring/room" method="get" name="roomIn">
+                        <input type="hidden" name="roomId" th:value="${room.roomId}">
+                        <td><input type="button" class="btn btn-link btn-lg"
+                                   th:onclick="roomPwCheck([[${room.password}]])" th:value="${room.name}"></td>
+                    </form>
+                    <span th:if="(${#strings.equals(session['loginEmail'],'phl1021@naver.com')} or ${session.loginNick}==${room.chatMentor})">
+                <td>
+                    <button type="button" class="btn btn-danger" th:onclick="deleteById([[${room.chatRoomId}]])">
+                        채팅방 삭제
+                    </button>
+                </td>
+                </span>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <th:block th:replace="/member/mypage :: myPageSideBarFragment"></th:block>
+</div>
+<th:block th:replace="/layout/fragments/script :: scriptFragment"></th:block>
+</body>
+<script>
+    <!--    멘토링 승인-->
+    const mentoringApply = (menteeId) => {
+        const reqUrl = "/mentoring/mentoringApply/" + menteeId;
+        $.ajax({
+            url: reqUrl,
+            type: 'put',
+            dataType: 'text',
+            success: function (data) {
+                if (data == "ok") {
+                    alert('멘토링 1회 완료!');
+                    location.reload();
+                } else {
+                    alert('완료된 멘토링입니다.');
+                }
+            }, error: function () {
+                alert('실패')
+            }
+        })
+    }
+</script>
+<script th:inline="javascript">
+    $("#btn-create").on("click", function (e) {
+        e.preventDefault();
+
+        let name = $("input[name='name']").val();
+        let password = $("#password").val();
+        const chatRoomSave = document.forms["chatRoomSave"];
+
+        console.log(password);
+        //채팅방 이름 체크
+        if (name == "") {
+            alert("채팅방 이름을 적어주세요")
+        } else {
+            //비밀번호 입력 체크
+            if (password == null || isNaN(password)) {
+                alert("방 비밀번호 4자리 숫자를 입력해주세요.")
+            } else {
+                alert(name + "방이 개설되었습니다.");
+                chatRoomSave.submit();
+            }
+        }
+    });
+
+    function deleteById(chatRoomId) {
+        const reqUrl = "/mentoring/chat/" + chatRoomId;
+        $.ajax({
+            url: reqUrl,
+            type: 'delete',
+            success: function () {
+                alert('삭제되었습니다.')
+                location.reload();
+            }, error: function () {
+                alert('요청실패')
+            }
+        })
+    }
+
+    //채팅방 비밀번호 체크
+    function roomPwCheck(roomPw) {
+        let roomPwCheck = prompt("채팅방 비밀번호를 입력하세요.");
+        const roomIn = document.forms["roomIn"];
+        if (roomPw == roomPwCheck) {
+            roomIn.submit();
+        } else {
+            alert('비밀번호가 틀렸습니다.');
+        }
+    }
+
+
+</script>
+
+
+</html>

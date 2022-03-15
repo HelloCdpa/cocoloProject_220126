@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<link rel="shortcut icon" href="#">
+<style>
+    #background {
+        background-image: url("https://cdn.pixabay.com/photo/2020/03/21/17/26/woman-4954694_1280.jpg");
+    }
+</style>
+<th:block th:replace="/layout/fragments/head :: headFragment"></th:block>
+<body>
+<div id="wrapper">
+    <header class="bg-gradient-dark">
+        <th:block th:replace="/layout/fragments/navbar :: navbarFragment"></th:block>
+
+        <div class="page-header min-vh-65" id="background">
+            <span class="mask bg-gradient-dark opacity-6"></span>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center mx-auto my-auto">
+                        <h1 class="text-white">나의 장바구니</h1>
+                        <p class="lead mb-4 text-white opacity-8">포인트로 수강권을 구매하여 개발 지식을 키워나가세요!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <input type="hidden" th:value="${session.loginEmail}" id="memberEmail">
+    <input type="hidden" th:value="${session.loginId}" id="memberId">
+
+    <div th:if="${cartCheck}" class="row">
+        <div class="col-md-8">
+        <div class="card card-body blur shadow-blur mx-1 mx-md-1 mt-n3">
+        <a href="/onClass/" class="h3">아직 장바구니에 담은 강의가 없어요🤸‍♂</a>
+        </div>
+        </div>
+        <th:block th:replace="/member/mypage :: myPageSideBarFragment"></th:block>
+    </div>
+
+    <div class="row" th:unless="${cartCheck}">
+        <div class="col-lg-8">
+            <div class="card card-body blur shadow-blur mx-1 mx-md-1 mt-n3">
+
+                <div id="cartLength" class="row">
+                    <form action="/onClass/payment" method="post" id="payment">
+                        <div class="col-md-3 mb-5" th:each="cart:${cartList}">
+                            <div class="card h-100">
+                                <a th:href="@{|/onClass/${cart.onClassId}|}">
+
+                                    <input type="hidden" th:value="${cart.onClassId}" name="onClassId">
+
+                                    <div class="card-body">
+                                        <p class="card-text text-center">
+                                            <img class="img-fluid rounded mb-4 mb-lg-0"
+                                                 th:src="@{/class_upload/}+${cart.onClassFileName}"
+                                                 alt="..." width="150" height="100"/></p>
+                                        <p class="card-text text-center h6" th:text="${cart.onClassTitle}"></p>
+                                    </div>
+                                </a>
+                                <div class="card-footer text-center">
+                                    <span class="card-text" id="onClassPrice" th:text="${cart.onClassPrice}"></span>
+                                    <span>point</span>
+                                </div>
+                                <button type="button" class="btn btn-danger btn-sm"
+                                        th:onclick="deleteById([[${cart.cartId}]])">장바구니에서 삭제
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card card-body blur shadow-blur mx-1 mx-md-1 mt-n3">
+                <div class="h4">총계 : &#8361;<span th:text="*{totalPrice}" th:value="*{totalPrice}"></span></div>
+                <div class="h6">포인트 사용 :<input class="form-control" type="number" min="0" th:max="*{memberPoint}"
+                                               id="point_use_value" name="pointUse" onblur="point_use()" value="0">
+                    <span th:text="*{'보유 포인트 : '+memberPoint +'point'}"></span>
+                </div>
+                <span class="h6" id="pointApply"></span>
+                <div class="h3"> 결제금액 : <span id="applyPrice" th:text="*{totalPrice}"></span></div>
+                <input type="hidden" id="point_value" value="0">
+                <input type="hidden" id="totalPrice" th:value="*{totalPrice}">
+                <input type="hidden" id="applyValue" th:value="*{totalPrice}">
+                <button type="button" class="btn btn-success" onclick="requestPay()" value="수강권 구매">수강권 구매</button>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="/layout/fragments/script :: scriptFragment"></th:block>
+</body>
+<script>
+    function deleteById(cartId) {
+        const reqUrl = "/cart/" + cartId;
+        $.ajax({
+            url: reqUrl,
+            type: 'delete',
+            success: function () {
+                alert('삭제되었습니다.')
+                location.reload();
+            }, error: function () {
+                alert('요청실패')
+            }
+        });
+    }
+</script>
+<script>
+    const point_use = () => {
+        const maxPoint = '[[${memberPoint}]]'
+        const point = document.getElementById('point_use_value');
+        const intPoint = parseInt(point.value);
+        //초기 값
+        const startPrice = document.getElementById('totalPrice').value;
+        const applyPrice = document.getElementById('applyPrice');
+
+        console.log(intPoint + "<" + maxPoint);
+        if (intPoint < maxPoint && intPoint <= startPrice) {
+            // 포인트가 적용된 값
+            const view = document.getElementById('pointApply');
+            document.getElementById('point_value').value = intPoint;
+
+            let finalInt = startPrice - intPoint;
+            applyPrice.innerHTML = `${finalInt} 원`;
+            view.innerHTML = `${startPrice}원 - ${intPoint}point 사용`;
+            $('#applyValue').val(finalInt);
+
+        } else if (intPoint > maxPoint) {
+            alert(`보유 포인트(${maxPoint})를 초과하였습니다.`);
+        } else if(intPoint == 0){
+            $('#applyValue').val(startPrice);
+            applyPrice.innerHTML = `${startPrice} 원`;
+        }
+        else {
+            alert('결제 금액을 초과하였습니다.');
+        }
+    }
+</script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+<script th:inline="javascript">
+    //구매 값과 구매자의 이메일
+
+    const memberEmail = document.querySelector("#memberEmail").value;
+    const memberId = document.querySelector("#memberId").value;
+
+
+    const IMP = window.IMP;
+    IMP.init('imp45182196');
+
+    console.log(memberEmail);
+
+    function requestPay() {
+        //결제할 금액
+        const applyPrice = parseInt(document.querySelector("#applyValue").value);
+        //사용한 포인트
+        const pointPoint = parseInt(document.getElementById('point_use_value').value);
+
+        const form = document.getElementById("payment");
+
+
+        // IMP.request_pay(param, callback) 결제창 호출
+        IMP.request_pay({ // param
+            pg: "kakao",
+            pay_method: "card",
+            merchant_uid: 'merchant_' + new Date().getTime(),
+            name: "수강권 구매",
+            amount: applyPrice,
+            buyer_email: memberEmail
+
+        }, function (rsp) { // callback
+            //결제금액이 0일 때
+            if(applyPrice == 0){
+                rsp.success = true;
+            }
+            if (rsp.success) {
+                form.submit();
+                alert('결제가 완료되었습니다.');
+                const pointUrl = "/onClass/pointPayment"
+                $.ajax({
+                    type: 'post',
+                    url: pointUrl,
+                    data: {
+                        "memberId": memberId,
+                        "pointPoint": pointPoint
+                    },
+                    success: function () {
+                    },
+                    error: function () {
+                        alert('ajax 실패');
+                    }
+                });
+
+            } else {
+                const msg = '결제에 실패하였습니다.';
+                alert(msg);
+            }
+
+
+        });
+    };
+</script>
+</html>

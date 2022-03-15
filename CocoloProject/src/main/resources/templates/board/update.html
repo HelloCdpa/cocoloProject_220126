@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<link rel="shortcut icon" href="#">
+<style>
+    #background {
+        background-image: url("https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80'");
+    }
+</style>
+<th:block th:replace="/layout/fragments/head :: headFragment"></th:block>
+<body>
+<div id="wrapper">
+    <header class="bg-gradient-dark">
+        <th:block th:replace="/layout/fragments/navbar :: navbarFragment"></th:block>
+
+        <div class="page-header min-vh-75" id="background">
+            <span class="mask bg-gradient-dark opacity-6"></span>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center mx-auto my-auto">
+                        <h1 class="text-white">Community</h1>
+                        <p class="lead mb-4 text-white opacity-8">함께하는 개발생활</p>
+                        <span th:if="${not #strings.isEmpty(session['loginEmail'])}">
+                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saveModal">게시글 작성하기</button>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="card card-body blur shadow-blur mx-3 mx-md-4 mt-n3">
+        <form id="updateForm" th:object="${board}" enctype="multipart/form-data">
+            <input type="hidden" th:field="*{boardHits}">
+            <input type="hidden" th:field="*{likeCount}">
+            <input type="hidden" th:field="*{boardId}">
+            <input type="hidden" th:field="*{memberId}">
+            <div class="container my-auto" width="200px">
+                <div class="card w-80">
+                    <div class="p-5">
+                        <div>
+                            <span th:each="category: ${categoryList}">
+                                <input type="radio" class="btn-check" th:value="${category.cateId}"
+                                       name="cateId" th:id="${category.cateName}" autocomplete="off" checked
+                                       required>
+                            <label class="btn btn-outline-primary" th:for="${category.cateName}"
+                                   th:text="${category.cateName}"></label>
+                            </span>
+                        </div>
+                        <div class="h6">작성자 : <span class="form-control" id="boardWriter" th:field="*{boardWriter}"
+                                                    th:text="*{boardWriter}"></span></div>
+                        <div class="input-group mb-4 input-group-static">
+                            <label>제목</label>
+                            <input type="text" class="form-control" th:value="*{boardTitle}" th:field="*{boardTitle}"
+                                   name="boardTitle">
+                        </div>
+
+                        <div class="text-center">
+                            <img th:src="@{/board_upload/} + *{boardFileName}" alt=""width="200px" height="auto">
+                        </div>
+
+                        <div class="input-group mb-4 input-group-static">
+                            <textarea id="summernote" type="text" class="form-control"
+                                      name="boardContents" rows="10">[[${board.boardContents}]]</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="boardFile">업로드 사진 선택</label>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="file" id="boardFile"
+                                                         name="boardFile">
+                            </div>
+                            <button type="button" class="btn btn-primary w-auto" onclick="boardUpdate()">게시글 수정</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<th:block th:replace="/layout/fragments/script :: scriptFragment"></th:block>
+</body>
+<script>
+    const boardUpdate = () => {
+        const boardId = document.getElementById('boardId').value;
+        const reqUrl = "/board/" + boardId;
+
+        const data = $('#updateForm')[0];
+        const formData = new FormData(data);
+
+        $.ajax({
+            type: 'put',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: formData,
+            url: reqUrl,
+            success: function () {
+                location.href = '/board/';
+            }, error: function () {
+                alert("요청실패")
+            }
+        })
+
+    };
+</script>
+
+
+</html>

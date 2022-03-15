@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<link rel="shortcut icon" href="#">
+
+<th:block th:replace="/layout/fragments/head :: headFragment"></th:block>
+
+<body>
+<th:block th:replace="/layout/fragments/navbar :: navbarFragment"></th:block>
+<div style="margin-top: 200px;">
+    <div class="container-fluid mx-3 mx-md-4 mt-n6 mb-4">
+        <!-- START Testimonials w/ user image & text & info -->
+        <section class="py-sm-7 py-5 position-relative">
+            <div class="container border">
+                <div class="row">
+                    <div class="col-9 mx-auto">
+                            <a class="nav-link nav-link-icon me-2" href="/mentoring/">Mentoring></a>
+                        <div class="mt-n8 mt-md-n9 text-center">
+                            <img class="avatar avatar-xxl shadow-xl position-relative z-index-2"
+                                 th:src="@{/member_upload/}+${mentoring.memberProfileName}" alt="bruce" loading="lazy">
+                        </div>
+                        <div class="row py-5">
+                            <div class="col-lg-7 col-md-7 z-index-2 position-relative px-md-2 px-sm-5 mx-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h3 class="mb-0 " th:text="${mentoring.mentoringTitle}"></h3>
+                                </div>
+                                <div class="row mb-4">
+                                    <div class="col-auto">
+                                        <span class="h6" th:text="${mentoring.mentoringWriter}"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <span class="h6" th:text="${mentoring.mentoringCate}"></span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="col-md-12 mb-3">
+                                        경력/특기 : <span th:text="${mentoring.mentoringCareer}"></span>
+                                    </div>
+                                </div>
+                                <form action="/member/pointPayment" method="post" name="pointPayment">
+                                    <div>
+                                        <p class="text-lg mb-3" th:utext="${mentoring.mentoringContents}"></p>
+                                        <span th:text="${mentoring.mentoringCount + ' 회 당 '}"></span>
+                                        <span th:text="${mentoring.mentoringPrice + ' point'}"></span>
+
+                                        <input type="hidden" id="mentoringId" th:value="${mentoring.mentoringId}">
+                                        <input type="hidden" id="mentoringCount" th:value="${mentoring.mentoringCount}">
+                                        <input type="hidden" name="memberId" id="loginId"
+                                               th:value="${session.loginId}">
+                                        <input type="hidden" th:value="${memberPoint}">
+                                    </div>
+                                    <div class="col-lg-6 mb-3">
+                                        <span type="text" th:text="${'총액 : '+ totalPrice + ' point'}"></span>
+                                        <input type="hidden" id="totalPrice" th:value="${totalPrice}"
+                                               name="pointPoint">
+                                        <div class="mb-3">
+                                        <input type="hidden" id="memberPoint" th:value="${memberPoint}">
+                                        <span th:text="${'사용 가능 포인트 : ' + memberPoint + ' point'}"></span>
+                                        </div>
+                                        <button type="button" class="btn btn-danger" onclick="mentoringPayment()">멘토링
+                                            신청하기
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<th:block th:replace="/layout/fragments/script :: scriptFragment"></th:block>
+</body>
+<script>
+    function mentoringPayment() {
+        const memberId = $('#loginId').val();
+        const mentoringId = $('#mentoringId').val();
+        const menteeCount = parseInt($('#mentoringCount').val());
+        const memberPoint = parseInt($('#memberPoint').val());
+        const totalPrice = parseInt($('#totalPrice').val());
+
+        if (memberPoint < totalPrice) {
+            alert('포인트가 부족합니다.');
+            location.href = '/member/pointCharge/' + memberId;
+        } else {
+            pointPayment.submit();
+
+            const reqUrl = "/mentoring/payment";
+            $.ajax({
+                url: reqUrl,
+                type: 'post',
+                data: {
+                    "memberId": memberId,
+                    "mentoringId": mentoringId,
+                    "menteeCount": menteeCount
+                },
+                success: function () {
+                    alert('신청 완료 되었습니다.');
+                    location.reload();
+                }, error: function () {
+                    alert('요청실패');
+                }
+            })
+        }
+    }
+</script>
+</html>

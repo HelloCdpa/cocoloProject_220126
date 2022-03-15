@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<link rel="shortcut icon" href="#">
+<style>
+    #background {
+        background-image: url("https://cdn.pixabay.com/photo/2015/07/19/10/00/school-work-851328_1280.jpg");
+    }
+</style>
+<th:block th:replace="/layout/fragments/head :: headFragment"></th:block>
+<body>
+<div id="wrapper">
+    <header class="bg-gradient-dark">
+        <th:block th:replace="/layout/fragments/navbar :: navbarFragment"></th:block>
+
+        <th:block th:replace="/onClass/save :: onClassSaveFragment"></th:block>
+
+        <div class="page-header min-vh-75" id="background">
+            <span class="mask bg-gradient-dark opacity-6"></span>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center mx-auto my-auto">
+                        <h1 class="text-white">Online ClassRoom</h1>
+                        <p class="lead mb-4 text-white opacity-8">포인트로 수강권을 구매하여 개발 지식을 키워나가세요!</p>
+                        <span th:if="${not #strings.isEmpty(session['loginEmail'])}">
+                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#onClassSave">게시글 작성하기</button>
+                    </span>
+                        <div class="d-flex justify-content-center">
+                            <!--카테고리 별로 보기-->
+                            <div>
+                                <a class="btn bg-gradient-primary w-auto me-2" href="/onClass/onClassCate/1">자바</a>
+                                <a class="btn bg-gradient-primary w-auto me-2" href="/onClass/onClassCate/2">스프링</a>
+                                <a class="btn bg-gradient-primary w-auto me-2" href="/onClass/onClassCate/3">파이썬</a>
+                                <a class="btn bg-gradient-primary w-auto me-2" href="/onClass/onClassCate/4">프론트엔드</a>
+                                <a class="btn bg-gradient-primary w-auto me-2" href="/onClass/onClassCate/5">기타</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="card card-body blur shadow-blur mx-3 mx-md-4 mt-n3">
+        <div class="row">
+            <div class="col-md-3 mb-5" th:each="onClass:${onClassList}">
+                <div class="card h-100">
+                    <a th:href="@{|/onClass/${onClass.onClassId}|}">
+                        <div class="card-body">
+                            <p class="card-text text-center">
+                                <img class="thumbnail rounded"
+                                     th:src="@{/class_upload/}+${onClass.onClassFileName}"
+                                     alt="..." width="200" height="150"/></p>
+                            <p class="card-text text-center h6" th:text="${onClass.onClassTitle}"></p>
+                            <p class="card-text text-center">
+                                <span th:text="${onClass.onClassCate}"></span>
+                                /<span th:text="${onClass.onClassIntro}"></span>
+                                <input type="hidden" id="onClassId" th:value="${onClass.onClassId}">
+                                <input type="hidden" id="memberId" th:value="${session.loginId}">
+                            </p>
+                        </div>
+                    </a>
+                    <div class="card-footer text-center">
+                        <span class="card-text" th:text="${onClass.onClassPrice}"></span>
+                        <span>point</span>
+                        <div>
+                            <!--찜하기-->
+                            <button class="btn bg-gradient-primary btn-icon btn-sm" type="button"
+                                    th:onclick="saveWish([[${onClass.onClassId}]],[[${session.loginId}]])">
+                                <div class="d-flex align-items-center">
+                                    <i class="material-icons me-2" aria-hidden="true">favorite</i>
+                                    찜 하기
+                                </div>
+                            </button>
+                            <button type="button" class="btn bg-gradient-primary btn-sm me-2"
+                                    th:onclick="saveCart([[${onClass.onClassId}]],[[${session.loginId}]])">장바구니에 담기
+                            </button>
+                        </div>
+                        <div th:if="(${#strings.equals(session['loginEmail'],'phl1021@naver.com')})">
+                            <button type="button" class="btn btn-danger"
+                                    th:onclick="deleteById([[${onClass.onClassId}]])">글삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="/layout/fragments/script :: scriptFragment"></th:block>
+</body>
+<script>
+    function deleteById(onClassId) {
+        const reqUrl = "/onClass/" + onClassId;
+        $.ajax({
+            url: reqUrl,
+            type: 'delete',
+            success: function () {
+                alert('삭제되었습니다.')
+                location.reload();
+            }, error: function () {
+                alert('요청실패')
+            }
+        })
+    }
+
+    function saveCart(onClassId, memberId) {
+        console.log(onClassId + memberId);
+        $.ajax({
+            type: 'post',
+            url: '/cart/save',
+            data: {
+                'onClassId': onClassId,
+                'memberId': memberId
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data) {
+                    alert('장바구니에 저장되었습니다.')
+                    location.reload();
+                } else {
+                    alert('이미 장바구니에 있습니다.')
+                }
+            },
+            error: function () {
+                alert('ajax 실패');
+            }
+        });
+    };
+
+    function saveWish(onClassId, memberId) {
+        $.ajax({
+            url: '/wish/save',
+            type: 'POST',
+            data: {'onClassId': onClassId, 'memberId': memberId},
+            success: function (data) {
+                if (data) {
+                    alert('위시리스트에 저장했습니다.')
+                    location.reload();
+                } else {
+                    alert('이미 찜한 상품입니다.')
+                }
+            }, error: function () {
+                console.log('오타 찾으세요')
+            }
+        });
+    };
+</script>
+
+</html>

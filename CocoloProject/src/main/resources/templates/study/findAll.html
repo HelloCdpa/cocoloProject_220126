@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<link rel="shortcut icon" href="#">
+<style>
+    #background {
+        background-image: url("https://cdn.pixabay.com/photo/2017/07/31/11/21/people-2557396_1280.jpg");
+    }
+</style>
+
+<th:block th:replace="/layout/fragments/head :: headFragment"></th:block>
+<body>
+<div id="wrapper">
+    <header class="bg-gradient-dark">
+        <th:block th:replace="/layout/fragments/navbar :: navbarFragment"></th:block>
+
+        <th:block th:replace="/study/save :: studySaveFragment"></th:block>
+
+        <div class="page-header min-vh-70" id="background">
+            <span class="mask bg-gradient-dark opacity-6"></span>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center mx-auto my-auto">
+                        <h1 class="text-white">study</h1>
+                        <p class="lead mb-4 text-white opacity-8">함께하는 개발생활</p>
+                        <span th:if="${not #strings.isEmpty(session['loginEmail'])}">
+                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                             data-bs-target="#studySaveModal">게시글 작성하기</button>
+                    </span>
+                        <div class="d-flex justify-content-center">
+                         <span>
+                             <a class="btn bg-gradient-primary w-auto me-2" href="/study/cateStudy/1">취업/면접</a>
+                            </span>
+                            <span>
+                             <a class="btn bg-gradient-primary w-auto me-2" href="/study/cateStudy/2">학습노하우</a>
+                            </span>
+                            <span>
+                             <a class="btn bg-gradient-primary w-auto me-2" href="/study/cateStudy/3">피드백</a>
+                            </span>
+                            <span>
+                             <a class="btn bg-gradient-primary w-auto me-2" href="/study/cateStudy/4">기타</a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="card card-body blur shadow-blur mx-1 mx-md-1 mt-n3">
+        <div class="container-fluid">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">제목</th>
+                    <th scope="col">작성자</th>
+                    <th scope="col">스터디 인원</th>
+                    <th scope="col">스터디 지역</th>
+                    <th scope="col">작성시간</th>
+                </tr>
+                </thead>
+                <tbody>
+                <span th:each="study,studyStat:${studyList}">
+                    <div class="accordion accordion-flush" th:id="${'accordionFlushExample' + study.studyId}">
+                        <div class="accordion-item">
+                            <input type="hidden" th:value="${study.studyId}" id="studyId">
+                            <tr>
+                                <th scope="row" th:text="${studyStat.count}"></th>
+                                <span class="accordion-header" th:id="${'flush-headingOne' + study.studyId}">
+                                   <td> <button th:text="${study.studyTitle}" class="accordion-button collapsed"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                th:data-bs-target="${'#flush-collapseOne' + study.studyId}"
+                                                aria-expanded="false"
+                                                th:aria-controls="${'flush-collapseOne' + study.studyId}">
+
+                                    </button></td>
+                                        <td th:text="${study.studyWriter}"></td>
+                                <td th:text="${study.studyCount+'/'+study.studyMax}"></td>
+                                <td th:text="${study.studyPlace}"></td>
+                                <td>
+                                    <span th:text="*{#temporals.format(study.createTime, 'yy/MM/dd HH:mm')}"></span>
+                                </td>
+                                </span>
+                            </tr>
+                            <tr>
+                                <td colspan="6">
+                                <div th:id="${'flush-collapseOne' + study.studyId}" class="accordion-collapse collapse"
+                                     th:aria-labelledby="${'flush-headingOne' + study.studyId}"
+                                     th:data-bs-parent="${'#accordionFlushExample' + study.studyId}">
+                                    <div class="accordion-body">
+                                        <div class="text-bold" th:utext="${study.studyContents}"></div>
+
+
+                                        <span th:if="${#strings.equals(session['loginNick'],study.studyWriter)}">
+                                            <button type="button" class="btn btn-danger"
+                                                    th:onclick="deleteById([[${study.studyId}]])">글삭제</button>
+                                            <a class="btn btn-outline-info"
+                                               th:href="@{|/study/update/${study.studyId}|}">글수정</a>
+                                        </span>
+                                        <!--                                  작성자가 스터디 모집 신청 방지 -->
+                                        <span th:if="${not #strings.isEmpty(session['loginEmail']) && not #strings.equals(session['loginNick'],study.studyWriter)}">
+                                          <button class="btn btn-outline-info"
+                                                  th:onclick="studyApply([[${study.studyId}]])">스터디 신청하기</button>
+                                        </span>
+                                    </div>
+                                </div>
+                                </td>
+                            </tr>
+                        </div>
+                    </div>
+                </span>
+                </tbody>
+            </table>
+
+
+            <input type="hidden" th:value="${session.loginId}" id="memberId">
+        </div>
+    </div>
+    <th:block th:replace="/layout/fragments/script :: scriptFragment"></th:block>
+</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script>
+    function deleteById(studyId) {
+        const reqUrl = "/study/" + studyId;
+        $.ajax({
+            url: reqUrl,
+            type: 'delete',
+            success: function () {
+                alert('삭제되었습니다.')
+                location.reload();
+            }, error: function () {
+                alert('요청실패')
+            }
+        })
+    }
+</script>
+<script>
+    function studyApply(studyId) {
+        const memberId = $('#memberId').val();
+
+        console.log('클릭한 회원 = ' + memberId + 'studyId = ' + studyId);
+
+        const reqUrl = "/studyApply/";
+        $.ajax({
+            url: reqUrl,
+            type: 'post',
+            data: {
+                'memberId': memberId,
+                'studyId': studyId
+            },
+            dataType: 'text',
+            success: function (data) {
+                if (data == "ok") {
+                    alert('신청되었습니다.')
+                    location.reload();
+                } else {
+                    alert('이미 신청한 스터디 입니다.')
+                }
+
+
+            }, error: function () {
+                alert('요청실패')
+            }
+        })
+    }
+</script>
+</html>
